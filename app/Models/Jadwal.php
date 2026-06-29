@@ -4,13 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Kursi extends Model
+class Jadwal extends Model
 {
     protected $fillable = [
-        'studio_id',
-        'nomor_kursi',
-        'status'
-    ];
+    'film_id',
+    'studio_id',
+    'tanggal',
+    'jam_tayang',
+    'harga_tiket'
+];
+
+    public function film()
+    {
+        return $this->belongsTo(Film::class);
+    }
 
     public function studio()
     {
@@ -21,8 +28,4 @@ class Kursi extends Model
     {
         return $this->hasMany(Pemesanan::class);
     }
-    public function detailPemesanans()
-{
-    return $this->hasMany(DetailPemesanan::class);
-}
 }
