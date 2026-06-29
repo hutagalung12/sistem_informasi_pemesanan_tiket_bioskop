@@ -12,7 +12,14 @@ class Pemesanan extends Model
         'kursi_id',
         'jumlah_tiket',
         'total_harga',
-        'status'
+        'status',
+        'metode_pembayaran',
+        'kode_pembayaran',
+        'expired_at'
+    ];
+
+    protected $casts = [
+        'expired_at' => 'datetime',
     ];
 
     public function user()
@@ -29,4 +36,8 @@ class Pemesanan extends Model
     {
         return $this->belongsTo(Kursi::class);
     }
+    public function detailPemesanans()
+{
+    return $this->hasMany(DetailPemesanan::class);
+}
 }
