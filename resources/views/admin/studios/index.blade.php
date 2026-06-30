@@ -1,87 +1,101 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Studio')
+@section('title', 'Data Studio')
 
 @section('content')
 <div class="container my-5">
-    
-    <!-- Header Halaman + Tombol Kembali -->
+
+    <!-- Section Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1">✏️ Edit Data Studio</h2>
-            <p class="text-muted small mb-0">Sesuaikan nama studio atau perbarui total kapasitas kursi yang tersedia.</p>
+            <h2 class="fw-bold text-dark mb-1">🏢 Data Studio</h2>
+            <p class="text-muted small mb-0">Kelola daftar studio bioskop, kapasitas tempat duduk, dan kesiapan operasional.</p>
         </div>
-        <a href="{{ route('studios.index') }}" class="btn btn-outline-secondary px-4 py-2 rounded-3 shadow-sm text-decoration-none">
-            ⬅️ Kembali
+        <a href="{{ route('studios.create') }}" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
+            Tambah Studio
         </a>
     </div>
 
+    <!-- Notifikasi Sukses Berdesain Bersih -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <div class="d-flex align-items-center">
+                <span class="me-2">✅</span>
+                <div>{{ session('success') }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Wrapper Card Utama -->
-    <div class="card border-0 shadow-sm rounded-4 p-2 p-md-4">
-        <div class="card-body">
-
-            <!-- Notifikasi Error Global -->
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
-                    <strong class="d-block mb-1">⚠️ Periksa kembali data yang diisi:</strong>
-                    <ul class="mb-0 ps-3">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <form action="{{ route('studios.update', $studio->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-
-                <div class="row g-4">
-                    <!-- Input Nama Studio -->
-                    <div class="col-md-7">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-secondary">Nama Studio</label>
-                            <input type="text" 
-                                   name="nama_studio" 
-                                   class="form-control form-control-lg rounded-3 @error('nama_studio') is-invalid @enderror" 
-                                   value="{{ old('nama_studio', $studio->nama_studio) }}" 
-                                   placeholder="Contoh: Studio 1, Studio Premier"
-                                   required>
-                            @error('nama_studio')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Input Kapasitas dengan Tambahan Satuan -->
-                    <div class="col-md-5">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-secondary">Kapasitas Tempat Duduk</label>
-                            <div class="input-group">
-                                <input type="number" 
-                                       name="kapasitas" 
-                                       class="form-control form-control-lg rounded-start-3 @error('kapasitas') is-invalid @enderror" 
-                                       value="{{ old('kapasitas', $studio->kapasitas) }}" 
-                                       placeholder="50"
-                                       required>
-                                <span class="input-group-text bg-light border-start-0 rounded-end-3 text-muted">🪑 Kursi</span>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light border-bottom text-uppercase fs-7 fw-semibold text-secondary">
+                    <tr>
+                        <th class="ps-4 py-3" style="width: 80px;">No</th>
+                        <th class="py-3">Nama Studio</th>
+                        <th class="py-3">Kapasitas Tempat Duduk</th>
+                        <th class="py-3 text-center" style="width: 240px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($studios as $studio)
+                    <tr>
+                        <!-- Nomor -->
+                        <td class="ps-4 fw-medium text-secondary">{{ $loop->iteration }}</td>
+                        
+                        <!-- Nama Studio (Otomatis Kapital di Awal Kata) -->
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fs-5">🎬</span>
+                                <span class="fw-bold text-dark text-capitalize fs-6">{{ $studio->nama_studio }}</span>
                             </div>
-                            @error('kapasitas')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Form: Tombol Simpan -->
-                <div class="border-top pt-4 mt-4 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-warning px-5 py-2.5 rounded-3 fw-bold shadow-sm text-dark">
-                        💾 Simpan Perubahan
-                    </button>
-                </div>
-
-            </form>
+                        </td>
+                        
+                        <!-- Kapasitas dengan Desain Badge Badge -->
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold fs-7">
+                                🪑 {{ $studio->kapasitas }} Kursi
+                            </span>
+                        </td>
+                        
+                        <!-- Tombol Aksi Outline Interaktif -->
+                        <td class="text-center pe-3">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ route('studios.show', $studio->id) }}" 
+                                   class="btn btn-outline-info btn-sm rounded-2 px-3 fw-medium">
+                                    Detail
+                                </a>
+                                <a href="{{ route('studios.edit', $studio->id) }}" 
+                                   class="btn btn-outline-warning btn-sm rounded-2 px-3 fw-medium">
+                                    Edit
+                                </a>
+                                <form action="{{ route('studios.destroy', $studio->id) }}" 
+                                      method="POST" 
+                                      style="display:inline"
+                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus studio ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 px-3 fw-medium">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <!-- State jika data studio kosong -->
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <div class="mb-2 fs-2">🏢</div>
+                            <h6 class="fw-bold text-dark">Belum ada data studio</h6>
+                            <p class="small mb-0">Klik tombol "Tambah Studio" di atas untuk memasukkan data baru.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
