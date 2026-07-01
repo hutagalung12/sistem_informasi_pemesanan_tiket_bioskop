@@ -1,130 +1,90 @@
-@extends('layouts.app')
+<?php
 
-@section('content')
+namespace App\Http\Controllers;
 
-<div class="container mt-4">
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
-    <h2 class="mb-4">🎟 Riwayat Pemesanan</h2>
+class UserController extends Controller
+{
+    /**
+     * Menampilkan daftar user
+     */
+    public function index()
+    {
+        $users = User::orderBy('id', 'desc')->get();
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+        return view('admin.users.index', compact('users'));
+    }
 
-    <table class="table table-bordered table-striped">
+    /**
+     * Simpan user baru
+     */
+   public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|max:100',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6',
+        'role' => 'required',
+        'nohp' => 'required',
+        'alamat' => 'required'
+    ]);
 
-        <thead class="table-dark">
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role,
+        'nohp' => $request->nohp,
+        'alamat' => $request->alamat,
+    ]);
 
-        <tr>
+    return back()->with('success','User berhasil ditambahkan');
+}
 
-            <th>Film</th>
+    /**
+     * Update User
+     */
+   public function update(Request $request, User $user)
+{
+    $request->validate([
+        'name' => 'required|max:100',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'role' => 'required',
+        'nohp' => 'required',
+        'alamat' => 'required'
+    ]);
 
-            <th>Kursi</th>
+    $data = [
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => $request->role,
+        'nohp' => $request->nohp,
+        'alamat' => $request->alamat,
+    ];
 
-            <th>Total</th>
+    if ($request->filled('password')) {
+        $data['password'] = Hash::make($request->password);
+    }
 
-            <th>Status</th>
+    $user->update($data);
 
-            <th>Tiket</th>
+    return back()->with('success','User berhasil diupdate');
+}
+    /**
+     * Hapus User
+     */
+    public function destroy(User $user)
+    {
+        // Hindari admin menghapus dirinya sendiri
+        if (auth()->id() == $user->id) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+        }
 
-        </tr>
+        $user->delete();
 
-        </thead>
-
-        <tbody>
-
-        @forelse($pemesanans as $item)
-
-            <tr>
-
-                <td>
-
-                    {{ $item->jadwal->film->judul }}
-
-                </td>
-
-                <td>
-
-                    @foreach($item->detailPemesanans as $detail)
-
-                        <span class="badge bg-primary">
-
-                            {{ $detail->kursi->nomor_kursi }}
-
-                        </span>
-
-                    @endforeach
-
-                </td>
-
-                <td>
-
-                    Rp {{ number_format($item->total_harga,0,',','.') }}
-
-                </td>
-
-                <td>
-
-                    @if($item->status=='pending')
-
-                        <span class="badge bg-warning">
-
-                            Pending
-
-                        </span>
-
-                    @elseif($item->status=='dibayar')
-
-                        <span class="badge bg-success">
-
-                            Dibayar
-
-                        </span>
-
-                    @else
-
-                        <span class="badge bg-danger">
-
-                            Dibatalkan
-
-                        </span>
-
-                    @endif
-
-                </td>
-
-                <td>
-
-                    <a href="{{ route('tiket.pdf',$item->id) }}"
-                       class="btn btn-primary btn-sm">
-
-                        📄 Cetak Tiket
-
-                    </a>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td colspan="5" class="text-center">
-
-                    Belum ada riwayat pemesanan.
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-        </tbody>
-
-    </table>
-
-</div>
-
-@endsection
+        return redirect()->back()->with('success', 'User berhasil dihapus');
+    }
+}
