@@ -161,21 +161,7 @@ Pilih Metode Pembayaran
 
 </h5>
 
-<div class="method mb-3">
 
-<label class="w-100 d-flex justify-content-between align-items-center m-0">
-
-<span>📱 QRIS</span>
-
-<input
-type="radio"
-name="metode_pembayaran"
-value="QRIS"
-required>
-
-</label>
-
-</div>
 
 <div class="method mb-3">
 
@@ -207,35 +193,6 @@ value="DANA">
 
 </div>
 
-<div class="method mb-3">
-
-<label class="w-100 d-flex justify-content-between align-items-center m-0">
-
-<span>🟣 OVO</span>
-
-<input
-type="radio"
-name="metode_pembayaran"
-value="OVO">
-
-</label>
-
-</div>
-
-<div class="method mb-4">
-
-<label class="w-100 d-flex justify-content-between align-items-center m-0">
-
-<span>🟢 GoPay</span>
-
-<input
-type="radio"
-name="metode_pembayaran"
-value="GoPay">
-
-</label>
-
-</div>
 
 <button
 class="btn btn-success btn-lg w-100">
@@ -257,54 +214,36 @@ class="btn btn-success btn-lg w-100">
 </div>
 
 <script>
-
-let expired = new Date("{{ $pemesanan->expired_at }}").getTime();
+// Mengambil timestamp langsung dalam bentuk milidetik dari server
+let expired = {{ \Carbon\Carbon::parse($pemesanan->expired_at)->getTimestamp() * 1000 }};
 
 let timer = setInterval(function(){
+    let now = new Date().getTime();
+    let distance = expired - now;
 
-let now = new Date().getTime();
+    if (distance < 0) {
+        clearInterval(timer);
+        document.getElementById("timer").innerHTML = "Waktu pembayaran habis";
+        return;
+    }
 
-let distance = expired-now;
+    let minutes = Math.floor(distance / (1000 * 60));
+    let seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-if(distance<0){
+    document.getElementById("timer").innerHTML = minutes + " menit " + seconds + " detik";
+}, 1000);
 
-clearInterval(timer);
-
-document.getElementById("timer").innerHTML="Waktu pembayaran habis";
-
-return;
-
-}
-
-let minutes=Math.floor(distance/(1000*60));
-
-let seconds=Math.floor((distance%(1000*60))/1000);
-
-document.getElementById("timer").innerHTML=
-
-minutes+" menit "+seconds+" detik";
-
-},1000);
-const methods=document.querySelectorAll('.method');
-
+// Script untuk pilihan metode pembayaran
+const methods = document.querySelectorAll('.method');
 methods.forEach(function(method){
-
-    method.addEventListener('click',function(){
-
+    method.addEventListener('click', function(){
         methods.forEach(function(m){
-
             m.classList.remove('active');
-
         });
-
         this.classList.add('active');
-
-        this.querySelector('input').checked=true;
-
+        this.querySelector('input').checked = true;
     });
-
 });
-
 </script>
 
 

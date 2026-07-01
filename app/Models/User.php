@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',      // <-- Tambahkan ini
+        'nohp',     // <-- Tambahkan ini (sesuaikan dengan nama kolom di database kamu)
+        'alamat',
     ];
 
     /**

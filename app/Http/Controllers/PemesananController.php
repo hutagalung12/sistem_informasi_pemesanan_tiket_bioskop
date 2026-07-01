@@ -82,6 +82,7 @@ public function store(Request $request)
    $pemesanan = Pemesanan::create([
     'user_id' => Auth::id(),
     'jadwal_id' => $request->jadwal_id,
+    'film_id' => $jadwal->film_id,
     'jumlah_tiket' => count($request->kursi_id),
     'total_harga' => $total,
     'status' => 'pending',

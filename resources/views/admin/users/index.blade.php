@@ -752,37 +752,40 @@ class="btn btn-danger btn-sm">
 
 </div>
 <script>
-
-document.addEventListener("DOMContentLoaded",function(){
-
+document.addEventListener("DOMContentLoaded", function() {
+    // === LOGIKA UNTUK MODAL EDIT ===
     const modal = new bootstrap.Modal(document.getElementById('modalEdit'));
-
-    document.querySelectorAll('.btnEdit').forEach(function(button){
-
-        button.addEventListener('click',function(){
-
-            let id=this.dataset.id;
-
-            document.getElementById('edit_name').value=this.dataset.name;
-
-            document.getElementById('edit_email').value=this.dataset.email;
-
-            document.getElementById('edit_role').value=this.dataset.role;
-
-            document.getElementById('edit_nohp').value=this.dataset.nohp;
-
-            document.getElementById('edit_alamat').value=this.dataset.alamat;
-
-            document.getElementById('edit_password').value='';
-
-            document.getElementById('formEdit').action="{{ url('admin/users') }}/"+id;
-
+    document.querySelectorAll('.btnEdit').forEach(function(button) {
+        button.addEventListener('click', function() {
+            let id = this.dataset.id;
+            document.getElementById('edit_name').value = this.dataset.name;
+            document.getElementById('edit_email').value = this.dataset.email;
+            document.getElementById('edit_role').value = this.dataset.role;
+            document.getElementById('edit_nohp').value = this.dataset.nohp;
+            document.getElementById('edit_alamat').value = this.dataset.alamat;
+            document.getElementById('edit_password').value = '';
+            document.getElementById('formEdit').action = "{{ url('admin/users') }}/" + id;
             modal.show();
-
         });
-
     });
 
-});
+    // === LOGIKA UNTUK PENCARIAN USER (LIVE SEARCH) ===
+    const searchInput = document.getElementById('searchUser');
+    const tableRows = document.querySelectorAll('#tableUser tbody tr');
 
+    searchInput.addEventListener('keyup', function() {
+        const filter = searchInput.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            // Mengambil teks dari kolom Nama, Email, No HP, Alamat, dan Role
+            const text = row.innerText.toLowerCase();
+            
+            if (text.includes(filter)) {
+                row.style.display = ''; // Tampilkan baris jika cocok
+            } else {
+                row.style.display = 'none'; // Sembunyikan baris jika tidak cocok
+            }
+        });
+    });
+});
 </script>

@@ -313,7 +313,7 @@ body {
     <div class="col-lg-8 mb-4">
         <div class="card shadow border-0 rounded-4">
             <div class="card-header bg-white py-3 border-0">
-                <h5 class="mb-0 fw-bold text-dark">🎬 Film Terbaru</h5>
+                <h5 class="mb-0 fw-bold text-dark">🎬 Film Populer</h5>
             </div>
             <div class="card-body">
                 <div class="row">

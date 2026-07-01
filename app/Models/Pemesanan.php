@@ -9,6 +9,7 @@ class Pemesanan extends Model
     protected $fillable = [
         'user_id',
         'jadwal_id',
+        'film_id',
         'kursi_id',
         'jumlah_tiket',
         'total_harga',
@@ -35,6 +36,10 @@ class Pemesanan extends Model
     public function kursi()
     {
         return $this->belongsTo(Kursi::class);
+    }
+    public function film()
+    {
+        return $this->belongsTo(Film::class);
     }
     public function detailPemesanans()
 {
